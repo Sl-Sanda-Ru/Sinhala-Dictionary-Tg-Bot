@@ -6,6 +6,7 @@ from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardButton,InlineKeyboardMarkup,CallbackQuery
 from handlers.dbhandle import join_search, CONN
 from handlers.messages import *
+from os import environ
 
 # Chunker Function Copied From Stackoverflow https://stackoverflow.com/questions/434287/how-to-iterate-over-a-list-in-chunks/434328#434328
 def chunker(seq, size):
@@ -13,14 +14,14 @@ def chunker(seq, size):
 
 bot = Client(
     "En-To-Si-Bot",
-    bot_token='',
-    api_hash='',
-    api_id=123
+    bot_token=environ['BOT_TOKEN'],
+    api_hash=environ['API_HASH'],
+    api_id=environ['API_ID']
     )
 @bot.on_message(filters.private & filters.command(['start']))
 async def start(client, message):
-    await message.reply_text(text=WELCOME_MESAGE,reply_to_message_id=message.id,
-    reply_markup=InlineKeyboardMarkup(WELCOMME_KEY))
+    await message.reply_text(text=WELCOME_MESSAGE,reply_to_message_id=message.id,
+    reply_markup=InlineKeyboardMarkup(WELCOME_KEY))
 @bot.on_message(filters.private & filters.text)
 async def trans(client, message):
     if not message.text.isalpha():

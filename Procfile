@@ -1,1 +1,1 @@
-worker: python3 -m Dict-Bot
+worker: python3 Dict-Bot

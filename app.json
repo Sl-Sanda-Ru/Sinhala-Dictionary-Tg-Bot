@@ -1,0 +1,30 @@
+{
+    "name": "En-To-Si-Telegram-Bot",
+    "description": "With This Program You Can Set A Daily Reminder With SMS",
+    "logo": "https://repository-images.githubusercontent.com/528094051/1353d73a-08f6-4055-ab2c-398a4893f591",
+    "keywords": ["pyrogram", "bot", "sinhala dictionary"],
+    "repository": "https://github.com/Sl-Sanda-Ru/En-To-Si-Telegram-Bot",
+    "website":   "https://t.me/sandaru_ashen",
+    "success_url": "https://t.me/sandaru_ashen",
+    "env": {
+        "BOT_TOKEN": {
+            "description": "Your Telegram Bot Token",
+            "required": true,
+            "value": "kTZ9rKVGsYZHdxXq2E7QUqpQdhABLe3VhB"
+        },
+        "API_HASH": {
+            "description": "Your API HASH Visit https://my.telegram.org/auth To Get It",
+            "required": true,
+            "value": "xMqStCV6g7TPVJs3gdaUMBsV9AJG6VfH"
+        },
+
+        "API_ID": {
+            "description": "Api Id",
+            "required": true,
+            "value": "34567"
+        }
+    },
+    "buildpacks": [{
+      "url": "heroku/python"
+      }]
+  }
