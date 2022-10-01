@@ -4,6 +4,6 @@ Just Send Me An English Word Or Sentence & I Will Translate For You ☺️'''
 WELCOME_KEY = [
     [
         InlineKeyboardButton('Repo 🌎', url="https://github.com/Sl-Sanda-Ru/En-To-Si-Telegram-Bot"),
-        InlineKeyboardButton('Contact Dev 🧑', url='https://t.me/Sl_Sanda_Ru')
+        InlineKeyboardButton('Contact Dev 🧑', url='https://t.me/sandaru_ashen')
     ]
 ]
