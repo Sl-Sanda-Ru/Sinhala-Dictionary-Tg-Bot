@@ -27,9 +27,9 @@ async def start(client, message):
 @bot.on_message(filters.private & filters.text)
 async def trans(client, message):
     if len(message.text.strip().split()) > 1:
-        await  message.reply_text('✅ ' + gtrans(message.text.strip()),reply_to_message_id = message.id)
+        await  message.reply_text('✅ ' + gtrans(message.text.strip() + '\nBot By :\t@Sandaru_Ashen'),reply_to_message_id = message.id)
     elif join_search(CONN,message.text)[0] is True:
-        await message.reply_text(text ='✅ ' + '\n✅ '.join(join_search(CONN,message.text)[1]),reply_to_message_id = message.id)
+        await message.reply_text(text ='✅ ' + '\n✅ '.join(join_search(CONN,message.text)[1] + '\nBot By :\t@Sandaru_Ashen'),reply_to_message_id = message.id)
     elif join_search(CONN,message.text)[0] is False:
         keyboard = []
         for i in chunker(join_search(CONN,message.text)[1],2):
