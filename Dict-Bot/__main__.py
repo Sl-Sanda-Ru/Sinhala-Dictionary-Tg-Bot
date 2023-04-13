@@ -2,7 +2,6 @@
 # coding: utf-8
 # By Sandaru Ashen: https://github.com/Sl-Sanda-Ru, https://t.me/Sl_Sanda_Ru
 
-from operator import gt
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardButton,InlineKeyboardMarkup,CallbackQuery
 from handlers.dbhandle import join_search, CONN
@@ -18,12 +17,11 @@ bot = Client(
     "En-To-Si-Bot",
     bot_token = 'YOUR BOT TOKEN, OBTAIN IT FROM @BotFather',
     api_hash = 'YOUR API HASH, OBTAIN IT FROM https://my.telegram.org/auth',
-    api_id = 
+    api_id = 1234
     )
 @bot.on_message(filters.private & filters.command(['start']))
 async def start(client, message):
-    await message.reply_text(text=WELCOME_MESSAGE,reply_to_message_id=message.id,
-    reply_markup=InlineKeyboardMarkup(WELCOME_KEY))
+    await message.reply_text(text=WELCOME_MESSAGE, reply_to_message_id=message.id, reply_markup=InlineKeyboardMarkup(WELCOME_KEY))
 @bot.on_message(filters.private & filters.text)
 async def trans(client, message):
     if len(message.text.strip().split()) > 1 or not(message.text.strip()).isalnum():
