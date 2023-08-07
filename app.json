@@ -1,9 +1,9 @@
 {
-    "name": "En-To-Si-Telegram-Bot",
+    "name": "Sinhala-Dictionary-Tg-Bot",
     "description": "English To Sinhala Telegram Bot",
     "logo": "https://repository-images.githubusercontent.com/528094051/1353d73a-08f6-4055-ab2c-398a4893f591",
     "keywords": ["pyrogram", "bot", "sinhala dictionary"],
-    "repository": "https://github.com/Sl-Sanda-Ru/En-To-Si-Telegram-Bot",
+    "repository": "https://github.com/Sl-Sanda-Ru/Sinhala-Dictionary-Tg-Bot",
     "website":   "https://t.me/Sl_Sanda_Ru",
     "success_url": "https://t.me/Sl_Sanda_Ru",
     "env": {
