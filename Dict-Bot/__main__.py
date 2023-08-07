@@ -3,11 +3,9 @@
 # By Sandaru Ashen: https://github.com/Sl-Sanda-Ru, https://t.me/Sl_Sanda_Ru
 
 from pyrogram import Client, filters
-from pyrogram.types import InlineKeyboardButton,InlineKeyboardMarkup,CallbackQuery
-from handlers.dbhandle import join_search, CONN
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
 from handlers.messages import *
-from handlers.gtrans import gtrans
-from os import environ
+from handlers.search import searcher, result_format
 
 # Chunker Function Copied From Stackoverflow https://stackoverflow.com/questions/434287/how-to-iterate-over-a-list-in-chunks/434328#434328
 def chunker(seq, size):
@@ -19,18 +17,20 @@ bot = Client(
     api_hash = 'YOUR API HASH, OBTAIN IT FROM https://my.telegram.org/auth',
     api_id = 1234
     )
+
 @bot.on_message(filters.private & filters.command(['start']))
 async def start(client, message):
     await message.reply_text(text=WELCOME_MESSAGE, reply_to_message_id=message.id, reply_markup=InlineKeyboardMarkup(WELCOME_KEY))
+
 @bot.on_message(filters.private & filters.text)
 async def trans(client, message):
-    if len(message.text.strip().split()) > 1 or not(message.text.strip()).isalnum():
-        await  message.reply_text('✅ ' + gtrans(message.text.strip() + '\nBot By :\t@sandaru_ashen'),reply_to_message_id = message.id)
-    elif join_search(CONN,message.text.lower())[0] is True:
-        await message.reply_text(text ='✅ ' + '\n✅ '.join(join_search(CONN,message.text.lower())[1]) + '\nBot By :\t@sandaru_ashen',reply_to_message_id = message.id)
-    elif join_search(CONN,message.text.lower())[0] is False:
+    res = searcher(message.text)
+    print('*'*10,"\n",res,'*'*10)
+    if res is None:
+        await message.reply_text('No Results!',reply_to_message_id = message.id)
+    elif res[0] == 1:
         keyboard = []
-        for i in chunker(join_search(CONN,message.text)[1],2):
+        for i in chunker(res[1],2):
             try:
                 keyboard.append(
                     [
@@ -44,12 +44,13 @@ async def trans(client, message):
                     ])
         keyboard = InlineKeyboardMarkup(keyboard)
         await  message.reply_text("No Results Found\nDo You Meant👇",reply_to_message_id = message.id, reply_markup = keyboard)
+    else:
+        await message.reply_text(result_format(res), reply_to_message_id = message.id)
+
 @bot.on_callback_query()
 async def callback(client, update):
-    if join_search(CONN,update.data)[1][0] != '':
-        await update.message.edit('✅ ' + '\n✅ '.join(join_search(CONN,update.data)[1]) + '\nBot By :\t@sandaru_ashen')
-    else:
-        await update.message.edit('✅ ' + gtrans(update.data) + '\nBot By :\t@sandaru_ashen')
+    await update.message.edit(result_format(searcher(update.data)))
+
 if __name__ == '__main__':
     print("Bot Started Running...")
     bot.run()

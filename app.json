@@ -1,11 +1,11 @@
 {
     "name": "En-To-Si-Telegram-Bot",
-    "description": "With This Program You Can Set A Daily Reminder With SMS",
+    "description": "English To Sinhala Telegram Bot",
     "logo": "https://repository-images.githubusercontent.com/528094051/1353d73a-08f6-4055-ab2c-398a4893f591",
     "keywords": ["pyrogram", "bot", "sinhala dictionary"],
     "repository": "https://github.com/Sl-Sanda-Ru/En-To-Si-Telegram-Bot",
-    "website":   "https://t.me/sandaru_ashen",
-    "success_url": "https://t.me/sandaru_ashen",
+    "website":   "https://t.me/Sl_Sanda_Ru",
+    "success_url": "https://t.me/Sl_Sanda_Ru",
     "env": {
         "BOT_TOKEN": {
             "description": "Your Telegram Bot Token",
