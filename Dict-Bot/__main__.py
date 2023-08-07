@@ -25,7 +25,6 @@ async def start(client, message):
 @bot.on_message(filters.private & filters.text)
 async def trans(client, message):
     res = searcher(message.text)
-    print('*'*10,"\n",res,'*'*10)
     if res is None:
         await message.reply_text('No Results!',reply_to_message_id = message.id)
     elif res[0] == 1:
