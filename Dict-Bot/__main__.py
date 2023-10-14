@@ -21,16 +21,16 @@ bot = Client(
 
 @bot.on_message(filters.private & filters.command(['start']))
 async def start(client, message):
-    insert(message.from_user.id)
+    if search(message.from_user.id) is None:
+        insert(message.from_user.id)
     await message.reply_text(text=WELCOME_MESSAGE, reply_to_message_id=message.id, reply_markup=WELCOME_KEY)
 
 @bot.on_message(filters.private & filters.command(['all_languages']))
-async def start(client, message):
-    if search(message.from_user.id) is None:
-        insert(message.from_user.id)
-        await message.reply_text(text=ALL_LANGS_MESSAGE, reply_to_message_id=message.id, reply_markup=ALL_LANGS_KEYBOARD_DIS)
+async def alllangs(client, message):
+    if search(message.from_user.id) is False:
+        await message.reply_text(text=ALL_LANGS_MESSAGE.format('🚫 Disabled'), reply_to_message_id=message.id, reply_markup=ALL_LANGS_KEYBOARD_EN)
     else:
-        await message.reply_text(text=ALL_LANGS_MESSAGE, reply_to_message_id=message.id, reply_markup=ALL_LANGS_KEYBOARD_EN)
+        await message.reply_text(text=ALL_LANGS_MESSAGE.format('✅ Enabled'), reply_to_message_id=message.id, reply_markup=ALL_LANGS_KEYBOARD_DIS)
 
 @bot.on_message(filters.private & filters.text)
 async def trans(client, message):

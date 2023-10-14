@@ -1,5 +1,5 @@
-Pyrogram==2.0.41
-TgCrypto==1.2.3
+Pyrogram
+TgCrypto
 googletrans==3.1.0a0
-requests==2.28.1
-tinydb==4.8.0
+requests
+tinydb
