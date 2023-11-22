@@ -1,61 +1,66 @@
-import re
-import requests
+import sqlite3
 from googletrans import Translator
+from langcodes import Language
+from random import shuffle
 
-def gtranslator(word:str, other_langs=False) -> str:
-    translator = Translator()
-    translation = translator.translate(word, dest='si')
-    if other_langs:
-        return translation.text if word != translation.text else False
-    if translation.src != 'en' and word != translation.text:
-        return 'no'
-    return translation.text if translation.src == 'en' and word != translation.text else False
+translator = Translator()
 
-def get_cooks():
-    r = requests.get('https://www.helakuru.lk/dictionary',
-                     headers={
-                         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36'
-                     })
-    cooks = r.cookies.get('esp-ak')
-    return cooks
-
-COOKS = get_cooks()
-
-def get_define(word:str) -> list:
-    '''Return Codes: 0 No result,
-    1 No result but similar words
-    2 have results'''
-    r = requests.post('https://www.helakuru.lk/dictionary/get-dictionary-search',
-                      cookies={'esp-ak':COOKS},
-                      data={'word': word, 'csrf': COOKS},
-                      headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36'
-                     })
-    if r.json()['STATUS'] == True and r.json()['FIRST_DATA']['word'] != word:
-        return 1, re.findall("searchThis\('([^']+)'", #Pattern provided by chatgpt
-            r.json()['VIEW'])
-    elif r.json()['STATUS'] == True and r.json()['FIRST_DATA']['word'] == word:
-        return 2, r.json()['FIRST_DATA']['meaning'].split(", ")
-    return 0, []
-
-
-def definitions(word:str, other_langs=False) -> tuple:
-    fmatted = word.lower().strip()
-    if len(fmatted.split()) > 1:
-        tra = gtranslator(fmatted,other_langs)
-        if tra == 'no':
-            return tra
-        return tra if tra else None
+def get_define(word:str) -> tuple:
+    '''1 have results
+    2 No result but similar words    
+    3 no results probably src not english'''
+    with sqlite3.connect('file:sin_en.db?mode=ro', uri=True) as CONN:
+        CURSOR = CONN.cursor()
+        CURSOR.execute("SELECT en_to_sin_defs FROM en_to_sin WHERE en_to_sin_keys = ?", (word,))
+        RESULT = CURSOR.fetchone()
+        if RESULT is not None:
+            return 1, RESULT[0].split('%')
+        else:
+            suggest = []
+            for i in range(len(word), 0, -1):
+                CURSOR.execute(
+                    "SELECT en_to_sin_keys FROM en_to_sin WHERE en_to_sin_keys LIKE ?",
+                    (word[0: i] + "%",)
+                    )
+                RESULT = CURSOR.fetchall()
+                if len(RESULT) >= 10:
+                    shuffle(RESULT)
+                    for i in RESULT[:10]:
+                        suggest.append(i[0])
+                    break
+            CURSOR.close()
+            if suggest == []:
+                return 3,
+        return 2, suggest   
+def gtranslator(word, any=False):
+    '''1: normal ok
+    2: any disabled'''
+    lan = translator.detect(text=word)
+    if any:
+        if lan.lang == 'si':
+            return 1, translator.translate(text=word, dest='en').text
+        else:
+            return 1, translator.translate(text=word, dest='si').text
+    elif lan.lang != 'en':
+        lan_name = Language.make(language=lan.lang).display_name()
+        return 2, lan_name
     else:
-        tra = get_define(fmatted)
-        if tra[0] == 2:
-            return tra[1]
-        elif tra[0] == 1:
-            return tra
-        gtra = gtranslator(fmatted)
-        return gtra if gtra else None
+        return 1, translator.translate(text=word, dest='si').text
+
+def join_search(word, any=False):
+    if len(word.split(' ')) == 1:
+        result = get_define(word)
+        if result[0] == 3:
+            result = gtranslator(word, any=any)
+            return result
+        else:
+            return result
+    else:
+        result = gtranslator(word, any=any)
+        return result
 
 def result_format(result) -> str:
     if isinstance(result, str):
         return f'✅ {result} \nBot By :\t@Sl_Sanda_Ru'
     else:
-        return '✅ ' + '\n✅ '.join(result) + '\nBot By :\t@Sl_Sanda_Ru'
+        return '✅ ' + "\n✅ ".join(result) + "\nBot By :\t@Sl_Sanda_Ru"

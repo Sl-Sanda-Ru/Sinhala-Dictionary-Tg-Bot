@@ -1,5 +1,6 @@
 Pyrogram
 TgCrypto
 googletrans==3.1.0a0
-requests
 tinydb
+langcodes
+language_data
