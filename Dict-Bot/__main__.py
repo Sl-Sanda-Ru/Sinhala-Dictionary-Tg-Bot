@@ -14,9 +14,9 @@ def chunker(seq, size):
 
 bot = Client(
     'Sinhala-Dictionary-Tg-Bot',
-    bot_token = '6043751451:AAHRz0qkNSudx5AkvKRq-xJfSxtnE6td5U4',
-    api_hash = '9fb3319c3d3d06ba0f707215e235d643',
-    api_id = 18916027
+    bot_token = 'YOUR BOT TOKEN, OBTAIN IT FROM @BotFather',
+    api_hash = 'YOUR API HASH, OBTAIN IT FROM https://my.telegram.org/auth',
+    api_id = 1234
     )
 
 @bot.on_message(filters.private & filters.command(['start']))
