@@ -7,14 +7,14 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQ
 from handlers.messages import *
 from handlers.search import join_search, result_format
 from handlers.back import insert, search
-import os
+from os import getenv
 from dotenv import load_dotenv
 
 
 load_dotenv(dotenv_path="config.env")
-APP_ID = os.getenv('APP_ID')
-BOT_TOKEN = os.getenv('BOT_TOKEN')
-API_HASH = os.getenv('API_HASH')
+APP_ID = getenv('APP_ID')
+BOT_TOKEN = getenv('BOT_TOKEN')
+API_HASH = getenv('API_HASH')
 
 # Chunker Function Copied From Stackoverflow https://stackoverflow.com/questions/434287/how-to-iterate-over-a-list-in-chunks/434328#434328
 def chunker(seq, size):
