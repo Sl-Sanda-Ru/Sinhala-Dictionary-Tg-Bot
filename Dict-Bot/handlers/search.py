@@ -1,7 +1,6 @@
 import sqlite3
 from googletrans import Translator
 from langcodes import Language
-from random import shuffle
 from difflib import get_close_matches
 
 translator = Translator()
