@@ -1,7 +1,7 @@
 import sqlite3
 from googletrans import Translator
 from langcodes import Language
-from random import shuffle
+from difflib import get_close_matches
 
 translator = Translator()
 
@@ -16,18 +16,9 @@ def get_define(word:str) -> tuple:
         if RESULT is not None:
             return 1, RESULT[0].split('%')
         else:
-            suggest = []
-            for i in range(len(word), 0, -1):
-                CURSOR.execute(
-                    "SELECT en_to_sin_keys FROM en_to_sin WHERE en_to_sin_keys LIKE ?",
-                    (word[0: i] + "%",)
-                    )
-                RESULT = CURSOR.fetchall()
-                if len(RESULT) >= 10:
-                    shuffle(RESULT)
-                    for i in RESULT[:10]:
-                        suggest.append(i[0])
-                    break
+            CURSOR.execute("SELECT en_to_sin_keys FROM en_to_sin")
+            all_strings = [result[0] for result in CURSOR.fetchall()]
+            suggest = get_close_matches(word, all_strings, n=10, cutoff=0.5)
             CURSOR.close()
             if suggest == []:
                 return 3,

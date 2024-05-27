@@ -7,6 +7,14 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQ
 from handlers.messages import *
 from handlers.search import join_search, result_format
 from handlers.back import insert, search
+from os import getenv
+from dotenv import load_dotenv
+
+
+load_dotenv(dotenv_path="config.env")
+APP_ID = getenv('APP_ID')
+BOT_TOKEN = getenv('BOT_TOKEN')
+API_HASH = getenv('API_HASH')
 
 # Chunker Function Copied From Stackoverflow https://stackoverflow.com/questions/434287/how-to-iterate-over-a-list-in-chunks/434328#434328
 def chunker(seq, size):
@@ -14,27 +22,41 @@ def chunker(seq, size):
 
 bot = Client(
     'Sinhala-Dictionary-Tg-Bot',
-    bot_token = 'YOUR BOT TOKEN, OBTAIN IT FROM @BotFather',
-    api_hash = 'YOUR API HASH, OBTAIN IT FROM https://my.telegram.org/auth',
-    api_id = 1234
+    bot_token = BOT_TOKEN,
+    api_hash = API_HASH,
+    api_id = APP_ID
     )
 
 @bot.on_message(filters.private & filters.command(['start']))
 async def start(client, message):
+    await message.reply_text(text=WELCOME_MESSAGE, reply_to_message_id=message.id, reply_markup=WELCOME_KEY)
     if search(message.from_user.id) is None:
         insert(message.from_user.id)
-    await message.reply_text(text=WELCOME_MESSAGE, reply_to_message_id=message.id, reply_markup=WELCOME_KEY)
+        await client.send_message(message.from_user.id, SEL_LANG_MESSAGE, reply_markup=SEL_LANG_KEY)
 
 @bot.on_message(filters.private & filters.command(['all_languages']))
 async def alllangs(client, message):
-    if search(message.from_user.id) is False:
-        await message.reply_text(text=ALL_LANGS_MESSAGE.format('🚫 Disabled'), reply_to_message_id=message.id, reply_markup=ALL_LANGS_KEYBOARD_EN)
+    if search(message.from_user.id)[0] is False:
+        await message.reply_text(
+            text=ALL_LANGS_MESSAGE_SIN.format('🚫 අක්‍රීය') if search(message.from_user.id)[1] == 'sin' else ALL_LANGS_MESSAGE_EN.format('🚫 Disabled'),
+            reply_to_message_id=message.id,
+            reply_markup=ALL_LANGS_KEYBOARD_ENA_SIN if search(message.from_user.id)[1] == 'sin' else ALL_LANGS_KEYBOARD_ENA)
     else:
-        await message.reply_text(text=ALL_LANGS_MESSAGE.format('✅ Enabled'), reply_to_message_id=message.id, reply_markup=ALL_LANGS_KEYBOARD_DIS)
+        await message.reply_text(
+            text=ALL_LANGS_MESSAGE_SIN.format('✅ සක්‍රීය') if search(message.from_user.id)[1] == 'sin' else ALL_LANGS_MESSAGE_EN.format('🚫 Enabled'),
+            reply_to_message_id=message.id,
+            reply_markup=ALL_LANGS_KEYBOARD_DIS_SIN if search(message.from_user.id)[1] == 'sin' else ALL_LANGS_KEYBOARD_DIS)
+
+@bot.on_message(filters.private & filters.command(['bot_language']))
+async def botlang(client, message):
+    await client.send_message(message.from_user.id, SEL_LANG_MESSAGE, reply_markup=SEL_LANG_KEY)
 
 @bot.on_message(filters.private & filters.text)
 async def trans(client, message):
-    if search(message.from_user.id):
+    if not search(message.from_user.id)[1]:
+        await client.send_message(message.from_user.id, SEL_LANG_MESSAGE, reply_markup=SEL_LANG_KEY)
+        return
+    if search(message.from_user.id)[0]:
         res = join_search(message.text.strip().lower(), any=True)
     else:
         res = join_search(message.text.strip().lower())
@@ -55,19 +77,31 @@ async def trans(client, message):
                         [
                             InlineKeyboardButton(i[0],callback_data=i[0])
                         ])
-            await  message.reply_text('🚫 No Results Found\nDo You Meant👇', reply_to_message_id = message.id, reply_markup = InlineKeyboardMarkup(keyboard))
+            await  message.reply_text(NO_RES_SUGG_SIN.format(res[1]) if search(message.from_user.id)[1] == 'sin' else NO_RES_SUGG_EN, reply_to_message_id = message.id, reply_markup = InlineKeyboardMarkup(keyboard))
         else:
-            await message.reply_text(f'🚫 No Results!\nDetected Language: **{res[1]}**\nTo Translate Other Languages To Sinhala Use /all_languages Command', reply_to_message_id = message.id)
+            await message.reply_text(NO_RES_SIN.format(res[1]) if search(message.from_user.id)[1] == 'sin' else NO_RES_EN.format(res[1]), reply_to_message_id = message.id)
 
         # await client.pin_chat_message(chat_id=message.chat.id,message_id=message.id,both_sides=True)
 @bot.on_callback_query()
 async def callback(client, update):
     if update.data == 'dis':
-        insert(update.from_user.id)
-        await update.message.edit(text=ALL_LANGS_MESSAGE.format('🚫 Disabled'), reply_markup=ALL_LANGS_KEYBOARD_EN)
-    elif update.data == 'en':
+        insert(update.from_user.id, status=False)
+        await update.message.edit(
+            text= ALL_LANGS_MESSAGE_SIN.format('🚫 අක්‍රීය') if search(update.from_user.id)[1] == 'sin' else ALL_LANGS_MESSAGE_EN.format('🚫 Disabled')
+        )
+            # reply_markup= ALL_LANGS_KEYBOARD_ENA_SIN if search(update.from_user.id)[1] == 'sin' else ALL_LANGS_KEYBOARD_ENA)
+    elif update.data == 'ena':
         insert(update.from_user.id, status=True)
-        await update.message.edit(text=ALL_LANGS_MESSAGE.format('✅ Enabled'), reply_markup=ALL_LANGS_KEYBOARD_DIS)
+        await update.message.edit(
+            text= ALL_LANGS_MESSAGE_SIN.format('✅ සක්‍රීය') if search(update.from_user.id)[1] == 'sin' else ALL_LANGS_MESSAGE_EN.format('✅ Enabled')
+        )
+            # reply_markup= ALL_LANGS_KEYBOARD_DIS_SIN if search(update.from_user.id)[1] == 'sin' else ALL_LANGS_KEYBOARD_DIS)
+    elif update.data == 'eng':
+        insert(update.from_user.id, lang=update.data)
+        await update.message.edit(text=SET_LANG_ENG)
+    elif update.data == 'sin':
+        insert(update.from_user.id, lang=update.data)
+        await update.message.edit(text=SET_LANG_SIN)
     else:
         await update.message.edit(result_format(join_search(update.data)[1]))
 
