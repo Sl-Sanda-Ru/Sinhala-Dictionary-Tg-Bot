@@ -33,6 +33,9 @@ async def start(client, message):
     if search(message.from_user.id) is None:
         insert(message.from_user.id)
         await client.send_message(message.from_user.id, SEL_LANG_MESSAGE, reply_markup=SEL_LANG_KEY)
+@bot.on_message(filters.private & ~filters.text)
+async def media(client, message):
+    await message.reply_text(text=NO_MED_SIN if search(message.from_user.id)[1] == 'sin' else NO_MED_EN, reply_to_message_id=message.id)
 
 @bot.on_message(filters.private & filters.command(['all_languages']))
 async def alllangs(client, message):
