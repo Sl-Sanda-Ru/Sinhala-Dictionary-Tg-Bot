@@ -5,13 +5,15 @@ from difflib import get_close_matches
 
 translator = Translator()
 
-def get_define(word:str) -> tuple:
+
+def get_define(word: str) -> tuple:
     '''1 have results
     2 No result but similar words    
     3 no results probably src not english'''
     with sqlite3.connect('file:sin_en.db?mode=ro', uri=True) as CONN:
         CURSOR = CONN.cursor()
-        CURSOR.execute("SELECT en_to_sin_defs FROM en_to_sin WHERE en_to_sin_keys = ?", (word,))
+        CURSOR.execute(
+            "SELECT en_to_sin_defs FROM en_to_sin WHERE en_to_sin_keys = ?", (word,))
         RESULT = CURSOR.fetchone()
         if RESULT is not None:
             return 1, RESULT[0].split('%')
@@ -22,7 +24,9 @@ def get_define(word:str) -> tuple:
             CURSOR.close()
             if suggest == []:
                 return 3,
-        return 2, suggest   
+        return 2, suggest
+
+
 def gtranslator(word, any=False):
     '''1: normal ok
     2: any disabled'''
@@ -38,6 +42,7 @@ def gtranslator(word, any=False):
     else:
         return 1, translator.translate(text=word, dest='si').text
 
+
 def join_search(word, any=False):
     if len(word.split(' ')) == 1:
         result = get_define(word)
@@ -49,6 +54,7 @@ def join_search(word, any=False):
     else:
         result = gtranslator(word, any=any)
         return result
+
 
 def result_format(result) -> str:
     if isinstance(result, str):
